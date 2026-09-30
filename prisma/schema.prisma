@@ -31,8 +31,8 @@ model Provincia {
   clientes            Cliente[]
 
   archivado           Boolean      @default(false)
-  fecha_creacion      DateTime     @default(now())
-  fecha_actualizacion DateTime     @updatedAt
+  fechaCreacion      DateTime     @default(now())
+  fechaActualizacion DateTime     @updatedAt
 }
 
 model Localidad {
@@ -47,8 +47,8 @@ model Localidad {
   clientes            Cliente[]
 
   archivado           Boolean      @default(false)
-  fecha_creacion      DateTime     @default(now())
-  fecha_actualizacion DateTime     @updatedAt
+  fechaCreacion      DateTime     @default(now())
+  fechaActualizacion DateTime     @updatedAt
 }
 
 model Marca {
@@ -58,8 +58,8 @@ model Marca {
   productos           Producto[]
 
   archivado           Boolean      @default(false)
-  fecha_creacion      DateTime     @default(now())
-  fecha_actualizacion DateTime     @updatedAt
+  fechaCreacion      DateTime     @default(now())
+  fechaActualizacion DateTime     @updatedAt
 }
 
 model CategoriaNivel1 {
@@ -69,8 +69,8 @@ model CategoriaNivel1 {
   categoriasNivel2    CategoriaNivel2[]
 
   archivado           Boolean      @default(false)
-  fecha_creacion      DateTime     @default(now())
-  fecha_actualizacion DateTime     @updatedAt
+  fechaCreacion      DateTime     @default(now())
+  fechaActualizacion DateTime     @updatedAt
 }
 
 model CategoriaNivel2 {
@@ -83,8 +83,8 @@ model CategoriaNivel2 {
   productos           Producto[]
 
   archivado           Boolean      @default(false)
-  fecha_creacion      DateTime     @default(now())
-  fecha_actualizacion DateTime     @updatedAt
+  fechaCreacion      DateTime     @default(now())
+  fechaActualizacion DateTime     @updatedAt
 }
 
 model Producto {
@@ -110,8 +110,8 @@ model Producto {
   stockEnDepositos            StockProductoDeposito[]
 
   archivado                   Boolean      @default(false)
-  fecha_creacion              DateTime     @default(now())
-  fecha_actualizacion         DateTime     @updatedAt
+  fechaCreacion              DateTime     @default(now())
+  fechaActualizacion         DateTime     @updatedAt
 }
 
 model Deposito {
@@ -128,8 +128,8 @@ model Deposito {
   stockProductos      StockProductoDeposito[]
 
   archivado           Boolean      @default(false)
-  fecha_creacion      DateTime     @default(now())
-  fecha_actualizacion DateTime     @updatedAt
+  fechaCreacion      DateTime     @default(now())
+  fechaActualizacion DateTime     @updatedAt
 }
 
 model StockProductoDeposito {
@@ -143,8 +143,8 @@ model StockProductoDeposito {
   deposito            Deposito     @relation(fields: [depositoId], references: [id])
 
   archivado           Boolean      @default(false)
-  fecha_creacion      DateTime     @default(now())
-  fecha_actualizacion DateTime     @updatedAt
+  fechaCreacion      DateTime     @default(now())
+  fechaActualizacion DateTime     @updatedAt
 
   @@unique([productoId, depositoId])
 }
@@ -162,8 +162,8 @@ model Sucursal {
   usuarios            Usuario[]
 
   archivado           Boolean      @default(false)
-  fecha_creacion      DateTime     @default(now())
-  fecha_actualizacion DateTime     @updatedAt
+  fechaCreacion      DateTime     @default(now())
+  fechaActualizacion DateTime     @updatedAt
 }
 
 model Usuario {
@@ -178,8 +178,8 @@ model Usuario {
   sucursal            Sucursal     @relation(fields: [sucursalId], references: [id])
 
   archivado           Boolean      @default(false)
-  fecha_creacion      DateTime     @default(now())
-  fecha_actualizacion DateTime     @updatedAt
+  fechaCreacion      DateTime     @default(now())
+  fechaActualizacion DateTime     @updatedAt
 }
 
 model Cliente {
@@ -196,8 +196,8 @@ model Cliente {
   localidad           Localidad    @relation(fields: [localidadId], references: [id])
 
   archivado           Boolean      @default(false)
-  fecha_creacion      DateTime     @default(now())
-  fecha_actualizacion DateTime     @updatedAt
+  fechaCreacion      DateTime     @default(now())
+  fechaActualizacion DateTime     @updatedAt
 }
 
 model Proveedor {
@@ -206,7 +206,7 @@ model Proveedor {
   cuit                String       @unique
 
   archivado           Boolean      @default(false)
-  fecha_creacion      DateTime     @default(now())
-  fecha_actualizacion DateTime     @updatedAt
+  fechaCreacion      DateTime     @default(now())
+  fechaActualizacion DateTime     @updatedAt
 }
 

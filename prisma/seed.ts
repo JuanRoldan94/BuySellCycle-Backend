@@ -8,6 +8,7 @@ async function main() {
     if ( cantidadProvincias > 0 ) {
         return;
     } 
+    console.log('Cargando Provincias y Localidades');
 
     const responseProvincias = await fetch('https://apis.datos.gob.ar/georef/api/provincias?max=24');
     const dataProvincias = await responseProvincias.json();
