@@ -19,194 +19,320 @@ enum RolUsuario {
   Vendedor
 }
 
+enum TipoTarjeta {
+  CREDITO
+  DEBITO
+}
+
+enum ModoPago {
+  CONTADO
+  PLAN
+}
+
+enum ModoEntrega {
+  RETIRO_SUCURSAL
+  ENTREGA_DOMICILIO
+}
+
+enum EstadoVenta {
+  EN_PREPARACION
+  DISPONIBLE_PARA_RETIRAR
+  EN_CAMINO
+  ENTREGADO
+  CANCELADO
+}
+
 // ================= ENTIDADES =================
 
 model Provincia {
-  id                  Int          @id @default(autoincrement())
-  nombre              String
-  
-  localidades         Localidad[]
-  depositos           Deposito[]
-  sucursales          Sucursal[]
-  clientes            Cliente[]
+  id     Int    @id @default(autoincrement())
+  nombre String
 
-  archivado           Boolean      @default(false)
-  fechaCreacion      DateTime     @default(now())
-  fechaActualizacion DateTime     @updatedAt
+  localidades Localidad[]
+  depositos   Deposito[]
+  sucursales  Sucursal[]
+  clientes    Cliente[]
+
+  archivado          Boolean  @default(false)
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
 }
 
 model Localidad {
-  id                  Int          @id @default(autoincrement())
-  nombre              String
-  
-  provinciaId         Int
-  provincia           Provincia    @relation(fields: [provinciaId], references: [id])
-  
-  depositos           Deposito[]
-  sucursales          Sucursal[]
-  clientes            Cliente[]
+  id     Int    @id @default(autoincrement())
+  nombre String
 
-  archivado           Boolean      @default(false)
-  fechaCreacion      DateTime     @default(now())
-  fechaActualizacion DateTime     @updatedAt
+  provinciaId Int
+  provincia   Provincia @relation(fields: [provinciaId], references: [id])
+
+  depositos  Deposito[]
+  sucursales Sucursal[]
+  clientes   Cliente[]
+
+  archivado          Boolean  @default(false)
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
 }
 
 model Marca {
-  id                  Int          @id @default(autoincrement())
-  nombre              String
-  
-  productos           Producto[]
+  id     Int    @id @default(autoincrement())
+  nombre String
 
-  archivado           Boolean      @default(false)
-  fechaCreacion      DateTime     @default(now())
-  fechaActualizacion DateTime     @updatedAt
+  productos Producto[]
+
+  archivado          Boolean  @default(false)
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
 }
 
 model CategoriaNivel1 {
-  id                  Int          @id @default(autoincrement())
-  nombre              String
-  
-  categoriasNivel2    CategoriaNivel2[]
+  id     Int    @id @default(autoincrement())
+  nombre String
 
-  archivado           Boolean      @default(false)
-  fechaCreacion      DateTime     @default(now())
-  fechaActualizacion DateTime     @updatedAt
+  categoriasNivel2 CategoriaNivel2[]
+
+  archivado          Boolean  @default(false)
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
 }
 
 model CategoriaNivel2 {
-  id                  Int          @id @default(autoincrement())
-  nombre              String
-  
-  categoriaNivel1Id   Int
-  categoriaNivel1     CategoriaNivel1 @relation(fields: [categoriaNivel1Id], references: [id])
-  
-  productos           Producto[]
+  id     Int    @id @default(autoincrement())
+  nombre String
 
-  archivado           Boolean      @default(false)
-  fechaCreacion      DateTime     @default(now())
-  fechaActualizacion DateTime     @updatedAt
+  categoriaNivel1Id Int
+  categoriaNivel1   CategoriaNivel1 @relation(fields: [categoriaNivel1Id], references: [id])
+
+  productos Producto[]
+
+  archivado          Boolean  @default(false)
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
 }
 
 model Producto {
-  id                          Int          @id @default(autoincrement())
-  nombre                      String
-  stockTotal                  Int          @default(0)
-  costoNeto                   Decimal      @db.Decimal(10, 2)
-  utilidadPorcentaje          Decimal      @db.Decimal(5, 2)
-  precioLista                 Decimal      @db.Decimal(10, 2)
-  porcentajeDescuentoContado  Decimal      @db.Decimal(5, 2)
-  precioContado               Decimal      @db.Decimal(10, 2)
-  estado                      EstadoProducto @default(DISPONIBLE)
-  fechaUltimoMovimiento       DateTime?
-  fechaUltimaSincronizacion   DateTime?
-  rutaImagenStorage           String?
+  id                         Int            @id @default(autoincrement())
+  nombre                     String
+  stockTotal                 Int            @default(0)
+  costoNeto                  Decimal        @db.Decimal(10, 2)
+  utilidadPorcentaje         Decimal        @db.Decimal(5, 2)
+  precioLista                Decimal        @db.Decimal(10, 2)
+  porcentajeDescuentoContado Decimal        @db.Decimal(5, 2)
+  precioContado              Decimal        @db.Decimal(10, 2)
+  estado                     EstadoProducto @default(DISPONIBLE)
+  fechaUltimoMovimiento      DateTime?
+  fechaUltimaSincronizacion  DateTime?
+  rutaImagenStorage          String?
 
-  marcaId                     Int
-  marca                       Marca        @relation(fields: [marcaId], references: [id])
-  
-  categoriaNivel2Id           Int
-  categoriaNivel2             CategoriaNivel2 @relation(fields: [categoriaNivel2Id], references: [id])
-  
-  stockEnDepositos            StockProductoDeposito[]
+  marcaId Int
+  marca   Marca @relation(fields: [marcaId], references: [id])
 
-  archivado                   Boolean      @default(false)
-  fechaCreacion              DateTime     @default(now())
-  fechaActualizacion         DateTime     @updatedAt
+  categoriaNivel2Id Int
+  categoriaNivel2   CategoriaNivel2 @relation(fields: [categoriaNivel2Id], references: [id])
+
+  stockEnDepositos StockProductoDeposito[]
+
+  archivado          Boolean        @default(false)
+  fechaCreacion      DateTime       @default(now())
+  fechaActualizacion DateTime       @updatedAt
+  detalleVentas      DetalleVenta[]
 }
 
 model Deposito {
-  id                  Int          @id @default(autoincrement())
-  codigo              String       @unique 
-  nombre              String
-  
-  provinciaId         Int
-  provincia           Provincia    @relation(fields: [provinciaId], references: [id])
-  
-  localidadId         Int
-  localidad           Localidad    @relation(fields: [localidadId], references: [id])
-  
-  stockProductos      StockProductoDeposito[]
+  id     Int    @id @default(autoincrement())
+  codigo String @unique
+  nombre String
 
-  archivado           Boolean      @default(false)
-  fechaCreacion      DateTime     @default(now())
-  fechaActualizacion DateTime     @updatedAt
+  provinciaId Int
+  provincia   Provincia @relation(fields: [provinciaId], references: [id])
+
+  localidadId Int
+  localidad   Localidad @relation(fields: [localidadId], references: [id])
+
+  stockProductos StockProductoDeposito[]
+
+  archivado          Boolean  @default(false)
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
 }
 
 model StockProductoDeposito {
-  id                  Int          @id @default(autoincrement())
-  stock               Int          @default(0)
-  
-  productoId          Int
-  producto            Producto     @relation(fields: [productoId], references: [id])
-  
-  depositoId          Int
-  deposito            Deposito     @relation(fields: [depositoId], references: [id])
+  id    Int @id @default(autoincrement())
+  stock Int @default(0)
 
-  archivado           Boolean      @default(false)
-  fechaCreacion      DateTime     @default(now())
-  fechaActualizacion DateTime     @updatedAt
+  productoId Int
+  producto   Producto @relation(fields: [productoId], references: [id])
+
+  depositoId Int
+  deposito   Deposito @relation(fields: [depositoId], references: [id])
+
+  archivado          Boolean  @default(false)
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
 
   @@unique([productoId, depositoId])
 }
 
 model Sucursal {
-  id                  Int          @id @default(autoincrement())
-  nombre              String
-  
-  provinciaId         Int
-  provincia           Provincia    @relation(fields: [provinciaId], references: [id])
-  
-  localidadId         Int
-  localidad           Localidad    @relation(fields: [localidadId], references: [id])
-  
-  usuarios            Usuario[]
+  id     Int    @id @default(autoincrement())
+  nombre String
 
-  archivado           Boolean      @default(false)
-  fechaCreacion      DateTime     @default(now())
-  fechaActualizacion DateTime     @updatedAt
+  provinciaId Int
+  provincia   Provincia @relation(fields: [provinciaId], references: [id])
+
+  localidadId Int
+  localidad   Localidad @relation(fields: [localidadId], references: [id])
+
+  usuarios Usuario[]
+
+  archivado          Boolean  @default(false)
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
+  ventas             Venta[]
 }
 
 model Usuario {
-  id                  Int          @id @default(autoincrement())
-  nombre              String
-  apellido            String
-  dni                 String       @unique
-  nombreUsuario       String       @unique
-  rol                 RolUsuario
-  
-  sucursalId          Int
-  sucursal            Sucursal     @relation(fields: [sucursalId], references: [id])
+  id            Int        @id @default(autoincrement())
+  nombre        String
+  apellido      String
+  dni           String     @unique
+  nombreUsuario String     @unique
+  rol           RolUsuario
 
-  archivado           Boolean      @default(false)
-  fechaCreacion      DateTime     @default(now())
-  fechaActualizacion DateTime     @updatedAt
+  sucursalId Int
+  sucursal   Sucursal @relation(fields: [sucursalId], references: [id])
+
+  archivado          Boolean  @default(false)
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
 }
 
 model Cliente {
-  id                  Int          @id @default(autoincrement())
-  nombre              String
-  apellido            String
-  dni                 String       @unique
-  email               String       @unique
-  
-  provinciaId         Int
-  provincia           Provincia    @relation(fields: [provinciaId], references: [id])
-  
-  localidadId         Int
-  localidad           Localidad    @relation(fields: [localidadId], references: [id])
+  id       Int    @id @default(autoincrement())
+  nombre   String
+  apellido String
+  dni      String @unique
+  email    String @unique
 
-  archivado           Boolean      @default(false)
-  fechaCreacion      DateTime     @default(now())
-  fechaActualizacion DateTime     @updatedAt
+  provinciaId Int
+  provincia   Provincia @relation(fields: [provinciaId], references: [id])
+
+  localidadId Int
+  localidad   Localidad @relation(fields: [localidadId], references: [id])
+
+  archivado          Boolean            @default(false)
+  fechaCreacion      DateTime           @default(now())
+  fechaActualizacion DateTime           @updatedAt
+  direccionEntregas  DireccionEntrega[]
+  ventas             Venta[]
 }
 
 model Proveedor {
-  id                  Int          @id @default(autoincrement())
-  razonSocial         String
-  cuit                String       @unique
+  id          Int    @id @default(autoincrement())
+  razonSocial String
+  cuit        String @unique
 
-  archivado           Boolean      @default(false)
-  fechaCreacion      DateTime     @default(now())
-  fechaActualizacion DateTime     @updatedAt
+  archivado          Boolean  @default(false)
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
 }
 
+model DireccionEntrega {
+  id        Int     @id @default(autoincrement())
+  direccion String
+  principal Boolean @default(false)
+
+  clienteId Int
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+
+  archivado           Boolean  @default(false)
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
+}
+
+model Tarjeta {
+  id                Int         @id @default(autoincrement())
+  nombre            String
+  tipo              TipoTarjeta
+  rutaImagenStorage String?
+
+  planes Plan[]
+
+  archivado           Boolean  @default(false)
+  fechaCreacion       DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
+}
+
+model Banco {
+  id     Int    @id @default(autoincrement())
+  nombre String
+
+  planes Plan[]
+
+  archivado           Boolean  @default(false)
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
+}
+
+model Plan {
+  id               Int     @id @default(autoincrement())
+  cantidadCuotas   Int
+  tasaFinanciacion Decimal @db.Decimal(5, 2)
+  observaciones    String? @db.Text
+
+  tarjetaId Int
+  tarjeta   Tarjeta @relation(fields: [tarjetaId], references: [id])
+
+  bancoId Int
+  banco   Banco @relation(fields: [bancoId], references: [id])
+
+  ventas Venta[]
+
+  archivado           Boolean  @default(false)
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
+
+  @@unique([tarjetaId, bancoId, cantidadCuotas])
+}
+
+model Venta {
+  id                    Int         @id @default(autoincrement())
+  modoPago              ModoPago
+  modoEntrega           ModoEntrega
+  estado                EstadoVenta @default(EN_PREPARACION)
+  motivoCancelacion     String?     @db.Text
+  direccionEntregaTexto String?     @db.Text
+  montoTotal            Decimal     @db.Decimal(12, 2)
+
+  clienteId Int
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+
+  sucursalId Int
+  sucursal   Sucursal @relation(fields: [sucursalId], references: [id])
+
+  planId Int
+  plan   Plan @relation(fields: [planId], references: [id])
+
+  detalles DetalleVenta[]
+
+  archivado           Boolean  @default(false)
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
+}
+
+model DetalleVenta {
+  id             Int     @id @default(autoincrement())
+  cantidad       Int
+  precioUnitario Decimal @db.Decimal(10, 2)
+  subtotal       Decimal @db.Decimal(12, 2)
+
+  ventaId Int
+  venta   Venta @relation(fields: [ventaId], references: [id])
+
+  productoId Int
+  producto   Producto @relation(fields: [productoId], references: [id])
+
+  archivado           Boolean  @default(false)
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
+}

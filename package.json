@@ -19,7 +19,8 @@
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
-    "test:e2e": "vitest run --config ./vitest.config.e2e.ts"
+    "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
+    "firebase:emulator": "firebase emulators:start --import=./firebase-data --export-on-exit=./firebase-data"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",
@@ -34,6 +35,7 @@
     "class-validator": "^0.15.1",
     "dayjs": "^1.11.23",
     "decimal.js": "^10.6.0",
+    "firebase-admin": "^14.5.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "sharp": "^0.35.4"
