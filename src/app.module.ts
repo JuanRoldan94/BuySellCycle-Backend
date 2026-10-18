@@ -18,6 +18,7 @@ import { PresupuestosModule } from './modulos/presupuestos/presupuestos.module.j
 import { UbicacionesController } from './modulos/administracion/ubicaciones.controller.js';
 import { FirebaseModule } from './firebase/firebase.module.js';
 import { ErroresModule } from './errores/errores.module.js';
+import { ArchivosModule } from './archivos/archivos.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -45,6 +46,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     PresupuestosModule,
     FirebaseModule,
     ErroresModule,
+    ArchivosModule,
   ],
   controllers: [AppController, UbicacionesController],
   providers: [AppService],
