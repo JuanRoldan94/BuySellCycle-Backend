@@ -21,6 +21,9 @@ import { ErroresModule } from './errores/errores.module.js';
 import { ArchivosModule } from './archivos/archivos.module.js';
 import { FinanciacionModule } from './financiacion/financiacion.module.js';
 import { VentasModule } from './modulos/ventas/ventas/ventas.module.js';
+import { BancosModule } from './modulos/financiacion/bancos/bancos.module.js';
+import { TarjetasModule } from './modulos/financiacion/tarjetas/tarjetas.module.js';
+import { PlanesModule } from './modulos/financiacion/planes/planes.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -51,6 +54,9 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     ArchivosModule,
     FinanciacionModule,
     VentasModule,
+    BancosModule,
+    TarjetasModule,
+    PlanesModule,
   ],
   controllers: [AppController, UbicacionesController],
   providers: [AppService],
