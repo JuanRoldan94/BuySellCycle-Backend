@@ -17,6 +17,7 @@ import { StockModule } from './modulos/inventario/stock/stock.module.js';
 import { PresupuestosModule } from './modulos/presupuestos/presupuestos.module.js';
 import { UbicacionesController } from './modulos/administracion/ubicaciones.controller.js';
 import { FirebaseModule } from './firebase/firebase.module.js';
+import { ErroresModule } from './errores/errores.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -43,6 +44,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     StockModule,
     PresupuestosModule,
     FirebaseModule,
+    ErroresModule,
   ],
   controllers: [AppController, UbicacionesController],
   providers: [AppService],
