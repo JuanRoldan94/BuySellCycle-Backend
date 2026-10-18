@@ -20,6 +20,7 @@ import { FirebaseModule } from './firebase/firebase.module.js';
 import { ErroresModule } from './errores/errores.module.js';
 import { ArchivosModule } from './archivos/archivos.module.js';
 import { FinanciacionModule } from './financiacion/financiacion.module.js';
+import { VentasModule } from './modulos/ventas/ventas/ventas.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -49,6 +50,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     ErroresModule,
     ArchivosModule,
     FinanciacionModule,
+    VentasModule,
   ],
   controllers: [AppController, UbicacionesController],
   providers: [AppService],
