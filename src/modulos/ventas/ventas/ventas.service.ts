@@ -72,4 +72,30 @@ export class VentasService {
             return nuevaVenta;
         });
     }
+
+    async findAll() {
+        return await this.prisma.venta.findMany({
+            where: {
+                archivado: false
+            },
+            include: {
+                cliente: true,
+                sucursal: true,
+                plan: {
+                    include: {
+                        tarjeta: true,
+                        banco: true,
+                    }
+                },
+                detalles: {
+                    include: {
+                        producto: true
+                    }
+                }
+            },
+            orderBy: {
+                fechaCreacion: 'desc'
+            }
+        });
+    }
 }

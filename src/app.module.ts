@@ -19,7 +19,7 @@ import { UbicacionesController } from './modulos/administracion/ubicaciones.cont
 import { FirebaseModule } from './firebase/firebase.module.js';
 import { ErroresModule } from './errores/errores.module.js';
 import { ArchivosModule } from './archivos/archivos.module.js';
-import { FinanciacionModule } from './financiacion/financiacion.module.js';
+import { FinanciacionModule } from './modulos/financiacion/financiacion/financiacion.module.js';
 import { VentasModule } from './modulos/ventas/ventas/ventas.module.js';
 import { BancosModule } from './modulos/financiacion/bancos/bancos.module.js';
 import { TarjetasModule } from './modulos/financiacion/tarjetas/tarjetas.module.js';

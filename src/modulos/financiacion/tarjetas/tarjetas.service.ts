@@ -14,9 +14,14 @@ export class TarjetasService {
     return this.prisma.tarjeta.findMany({ where: { archivado: false }});
   }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} tarjeta`;
-  // }
+  async findOne(id: number) {
+    const registro = await this.prisma.tarjeta.findFirst({
+      where: {
+        id: id,
+        archivado: false
+      },
+    });
+  }
 
   async update(id: number, data: UpdateTarjetaDto) {
     const tarjeta = await this.prisma.tarjeta.findUnique({ where: { id } });

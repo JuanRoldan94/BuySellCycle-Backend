@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { CreatePlaneDto } from './dto/create-plane.dto.js';
+import { UpdatePlaneDto } from './dto/update-plane.dto.js';
 import { PrismaService } from '../../../prisma/prisma.service.js';
 
 @Injectable()
@@ -17,11 +18,27 @@ export class PlanesService {
     }
   }
 
+  async findOne(id: number) {
+    const registro = await this.prisma.plan.findFirst({
+      where: {
+        id: id,
+        archivado: false
+      },
+    });
+  }
+
   findAll() {
     return this.prisma.plan.findMany({
       where: { archivado: false },
       include: { tarjeta: true, banco: true },
     });
+  }
+
+  async update(id: number, data: UpdatePlaneDto) {
+    const tarjeta = await this.prisma.tarjeta.findUnique({ where: { id } });
+    if (!tarjeta) throw new NotFoundException(`Tarjeta #${id} no encontrada`);
+
+    return this.prisma.tarjeta.update({ where: { id }, data})
   }
 
   async remove(id: number) {

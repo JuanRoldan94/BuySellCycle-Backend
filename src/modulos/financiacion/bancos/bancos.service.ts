@@ -14,9 +14,14 @@ export class BancosService {
     return this.prisma.banco.findMany({ where: { archivado: false }});
   }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} banco`;
-  // }
+  async findOne(id: number) {
+    const registro = await this.prisma.banco.findFirst({
+      where: {
+        id: id,
+        archivado: false
+      },
+    });
+  }
 
   async update(id: number, data: UpdateBancoDto) {
     const banco = await this.prisma.banco.findUnique({ where: { id } });
