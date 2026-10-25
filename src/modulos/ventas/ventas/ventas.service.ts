@@ -1,6 +1,7 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service.js';
 import { CrearVentaDto } from './dto/crear-venta.dto.js';
+import { EstadoVenta } from '@prisma/client';
 
 @Injectable()
 export class VentasService {
@@ -96,6 +97,39 @@ export class VentasService {
             orderBy: {
                 fechaCreacion: 'desc'
             }
+        });
+    }
+
+    async actualizarEstado(id: number, estadoNuevo: EstadoVenta) {
+        return await this.prisma.$transaction(async (tx) => {
+            const venta = await tx.venta.findUnique({
+                where: { id },
+                include: { detalles: true }
+            });
+
+            if (!venta) {
+                throw new NotFoundException(`La venta #${id} no existe`);
+            }
+
+            if (venta.estado === 'CANCELADO' && estadoNuevo !== 'CANCELADO') {
+                throw new BadRequestException('Una venta cancelada no puede volver a activarse. Debe crear una nueva.');
+            }
+
+            if (estadoNuevo === 'CANCELADO' && venta.estado !== 'CANCELADO') {
+                for (const detalle of venta.detalles) {
+                await tx.producto.update({
+                    where: { id: detalle.productoId },
+                    data: {
+                    stockTotal: { increment: detalle.cantidad }
+                    }
+                });
+                }
+            }
+
+            return await tx.venta.update({
+                where: { id },
+                data: { estado: estadoNuevo },
+            });
         });
     }
 }
