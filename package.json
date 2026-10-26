@@ -35,7 +35,9 @@
     "class-validator": "^0.15.1",
     "dayjs": "^1.11.23",
     "decimal.js": "^10.6.0",
+    "firebase": "^13.0.0",
     "firebase-admin": "^14.5.0",
+    "firestore": "^1.1.6",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "sharp": "^0.35.5"
