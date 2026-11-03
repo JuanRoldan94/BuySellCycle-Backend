@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { CreatePresupuestoDto } from './dto/create-presupuesto.dto.js';
-import { UpdatePresupuestoDto } from './dto/update-presupuesto.dto.js';
 import { Decimal } from 'decimal.js'
 
 @Injectable()
