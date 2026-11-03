@@ -24,6 +24,7 @@ import { VentasModule } from './modulos/ventas/ventas/ventas.module.js';
 import { BancosModule } from './modulos/financiacion/bancos/bancos.module.js';
 import { TarjetasModule } from './modulos/financiacion/tarjetas/tarjetas.module.js';
 import { PlanesModule } from './modulos/financiacion/planes/planes.module.js';
+import { PdfModule } from './pdf/pdf.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -57,6 +58,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     BancosModule,
     TarjetasModule,
     PlanesModule,
+    PdfModule,
   ],
   controllers: [AppController, UbicacionesController],
   providers: [AppService],
