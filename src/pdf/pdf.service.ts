@@ -91,8 +91,8 @@ export class PdfService {
             y += 25;
             
             doc.fontSize(14).font('Helvetica-Bold').fillColor('#000000');
-            doc.text('TOTAL FINAL:', 300, y, { width: 140, align: 'right' });
-            doc.text(`$ ${this.formatearMoneda(Number(venta.montoTotal))}`, 450, y, { width: 90, align: 'right' });
+            doc.text('TOTAL FINAL:', 250, y, { width: 140, align: 'right' });
+            doc.text(`$ ${this.formatearMoneda(Number(venta.montoTotal))}`, 400, y, { width: 140, align: 'right', lineBreak: false });
 
             if (venta.modoPago === 'PLAN' && venta.plan) {
                 y += 30;
@@ -120,7 +120,7 @@ export class PdfService {
             doc.on('end', () => resolve(Buffer.concat(buffers)));
             doc.on('error', reject);
 
-            this.dibujarEncabezado(doc, 'PRESUPUESTO', 'SIMULACIÓN', new Date());
+            this.dibujarEncabezado(doc, 'PRESUPUESTO', 'Presupuesto', new Date());
             
             if (cliente) {
                 this.dibujarDatosCliente(doc, cliente, 140);
@@ -140,36 +140,40 @@ export class PdfService {
             
             data.items.forEach((item: any) => {
                 doc.text(item.cantidad.toString(), 50, y);
-                doc.text(item.nombre || 'Producto', 100, y);
+
+                const detalle = item.codigo ? `${item.nombre}` : (item.nombre || 'Producto');
+                doc.text(detalle, 100, y, { width: 240 });
                 doc.text(`$ ${this.formatearMoneda(Number(item.precioUnitario))}`, 350, y, { width: 90, align: 'right' });
                 doc.text(`$ ${this.formatearMoneda(Number(item.subtotal))}`, 450, y, { width: 90, align: 'right' });
-                y += 20;
+
+                const alturaTexto = doc.heightOfString(detalle, { width: 240 });
+                y += alturaTexto > 15 ? alturaTexto + 10 : 20;
             });
 
             doc.moveTo(350, y + 10).lineTo(550, y + 10).strokeColor('#cccccc').stroke();
             y += 25;
 
             doc.fontSize(10).font('Helvetica').fillColor('#666666');
-            doc.text('Subtotal Productos:', 300, y, { width: 140, align: 'right' });
-            doc.text(`$ ${this.formatearMoneda(Number(data.subtotal))}`, 450, y, { width: 90, align: 'right' });
+            doc.text('Subtotal Productos:', 250, y, { width: 140, align: 'right' });
+            doc.text(`$ ${this.formatearMoneda(Number(data.subtotal))}`, 400, y, { width: 140, align: 'right', lineBreak: false });
             y += 15;
 
             if (data.modoPago === 'PLAN' && data.tasaInteres > 0) {
                 doc.fillColor('#d93025');
-                doc.text(`Recargo Plan (+${data.tasaInteres}%):`, 300, y, { width: 140, align: 'right' });
-                doc.text(`$ ${this.formatearMoneda(Number(data.recargo))}`, 450, y, { width: 90, align: 'right' });
+                doc.text(`Recargo Plan (+${data.tasaInteres}%):`, 250, y, { width: 140, align: 'right' });
+                doc.text(`$ ${this.formatearMoneda(Number(data.recargo))}`, 400, y, { width: 140, align: 'right', lineBreak: false });
                 y += 15;
             }
 
             y += 10;
             doc.fontSize(14).font('Helvetica-Bold').fillColor('#000000');
-            doc.text('TOTAL FINAL:', 300, y, { width: 140, align: 'right' });
-            doc.text(`$ ${this.formatearMoneda(Number(data.total))}`, 450, y, { width: 90, align: 'right' });
+            doc.text('TOTAL FINAL:', 250, y, { width: 140, align: 'right' });
+            doc.text(`$ ${this.formatearMoneda(Number(data.total))}`, 400, y, { width: 140, align: 'right', lineBreak: false });
 
             if (data.modoPago === 'PLAN' && data.cuotas > 1) {
                 y += 30;
                 doc.fontSize(11).font('Helvetica').fillColor('#1890ff');
-                doc.text(`Simulación: ${data.cuotas} cuotas fijas de $ ${this.formatearMoneda(Number(data.valorCuota))}`, 50, y);
+                doc.text(`${data.cuotas} cuotas fijas de $ ${this.formatearMoneda(Number(data.valorCuota))}`, 50, y);
             }
 
             doc.end();
