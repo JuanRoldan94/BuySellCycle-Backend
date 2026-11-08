@@ -22,6 +22,10 @@ export class VentasController {
         @Param('id', ParseIntPipe) id: number,
         @Body() actualizarEstadoVentaDto: ActualizarEstadoVentaDto,
     ) {
-        return await this.ventasService.actualizarEstado(id, actualizarEstadoVentaDto.estado);
+        return await this.ventasService.actualizarEstado(
+            id, 
+            actualizarEstadoVentaDto.estado,
+            actualizarEstadoVentaDto.motivoCancelacion
+        );
     }
 }

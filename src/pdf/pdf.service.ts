@@ -90,19 +90,49 @@ export class PdfService {
             doc.moveTo(350, y + 10).lineTo(550, y + 10).strokeColor('#cccccc').stroke();
             y += 25;
             
+            const subtotalProductos = venta.detalles.reduce((acc, d) => acc + Number(d.subtotal), 0);
+            const totalFinal = Number(venta.montoTotal);
+            const recargo = Math.max(0, totalFinal - subtotalProductos);
+            const tasaInteres = Number(venta.plan?.tasaFinanciacion || 0);
+
+            doc.fontSize(10).font('Helvetica').fillColor('#666666');
+            doc.text('Subtotal Productos:', 250, y, { width: 140, align: 'right' });
+            doc.text(`$ ${this.formatearMoneda(subtotalProductos)}`, 400, y, { width: 140, align: 'right', lineBreak: false });
+            y += 15;
+
+            if (venta.modoPago === 'PLAN' && tasaInteres > 0 && recargo > 0) {
+                doc.fillColor('#d93025');
+                doc.text(`Recargo Plan (+${tasaInteres}%):`, 250, y, { width: 140, align: 'right' });
+                doc.text(`$ ${this.formatearMoneda(recargo)}`, 400, y, { width: 140, align: 'right', lineBreak: false });
+                y += 15;
+            }
+
+            y += 10;
             doc.fontSize(14).font('Helvetica-Bold').fillColor('#000000');
             doc.text('TOTAL FINAL:', 250, y, { width: 140, align: 'right' });
-            doc.text(`$ ${this.formatearMoneda(Number(venta.montoTotal))}`, 400, y, { width: 140, align: 'right', lineBreak: false });
+            doc.text(`$ ${this.formatearMoneda(totalFinal)}`, 400, y, { width: 140, align: 'right', lineBreak: false });
 
             if (venta.modoPago === 'PLAN' && venta.plan) {
+                const cuotas = venta.plan.cantidadCuotas;
+                const valorCuota = cuotas > 0 ? totalFinal / cuotas : totalFinal;
+
                 y += 30;
                 doc.fontSize(10).font('Helvetica').fillColor('#666666');
                 doc.text(`Abonado con ${venta.plan.tarjeta.nombre} ${venta.plan.banco.nombre}`, 50, y);
-                doc.text(`Financiado en ${venta.plan.cantidadCuotas} cuotas.`, 50, y + 15);
+
+                y += 15;
+                doc.fontSize(11).font('Helvetica').fillColor('#1890ff');
+                doc.text(`${cuotas} cuotas fijas de $ ${this.formatearMoneda(valorCuota)}`, 50, y);
             } else {
                 y += 30;
                 doc.fontSize(10).font('Helvetica').fillColor('#666666');
                 doc.text('Abonado: Al Contado / Efectivo', 50, y);
+            }
+
+            if (venta.estado === 'CANCELADO') {
+                y += 25;
+                doc.fontSize(10).font('Helvetica-Bold').fillColor('#dc3545');
+                doc.text(`VENTA CANCELADA - Motivo: ${venta.motivoCancelacion || 'No especificado'}`, 50, y);
             }
 
             doc.end();

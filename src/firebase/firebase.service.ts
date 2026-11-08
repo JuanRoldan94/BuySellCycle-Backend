@@ -11,8 +11,8 @@ export class FirebaseService implements OnModuleInit {
   onModuleInit() {
     if (getApps().length === 0) {
       initializeApp({
-        projectId: process.env.GCLOUD_PROJECT || 'demo-buysellcycle',
-        storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'demo-buysellcycle.appspot.com',
+        projectId: process.env.GCLOUD_PROJECT || 'demo-no-project',
+        storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'demo-no-project.appspot.com',
       });
     }
     

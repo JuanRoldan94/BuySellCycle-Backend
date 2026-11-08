@@ -27,7 +27,7 @@ export class MailService {
 
         await this.mailerService.sendMail({
             to: cliente.email,
-            subject: 'Tu Presupuesto - BuySellCycle S.R.L.',
+            subject: 'Presupuesto - BuySellCycle S.R.L.',
             text: `Hola ${cliente.nombre},\n\nAdjuntamos el presupuesto solicitado.\n\nSaludos,\nEl equipo de BuySellCycle.`,
             attachments: [
                 {
@@ -58,8 +58,8 @@ export class MailService {
 
         await this.mailerService.sendMail({
             to: venta.cliente.email,
-            subject: `Comprobante de Compra #${venta.id} - BuySellCycle S.R.L.`,
-            text: `Hola ${venta.cliente.nombre},\n\nMuchas gracias por tu compra en BuySellCycle S.R.L.\nAdjuntamos el comprobante de tu venta #${venta.id}.\n\nSaludos cordiales,\nEl equipo de BuySellCycle.`,
+            subject: `Comprobante de Compra - BuySellCycle S.R.L.`,
+            text: `Hola ${venta.cliente.nombre},\n\nMuchas gracias por tu compra en BuySellCycle S.R.L.\nAdjuntamos comprobante.\n\nSaludos,\nEl equipo de BuySellCycle.`,
             attachments: [
                 {
                     filename: `Comprobante-Venta-${venta.id}.pdf`,

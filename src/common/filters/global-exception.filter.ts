@@ -21,23 +21,35 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         ? exception.getResponse()
         : exception;
 
+    let detalleFormateado: string;
+    if (status === HttpStatus.NOT_FOUND) {
+      const mensajeOriginal =
+        typeof errorResponse === 'object' && errorResponse !== null
+          ? (errorResponse as any).message || JSON.stringify(errorResponse)
+          : String(errorResponse);
+
+      detalleFormateado = `Intento de acceso a endpoint inexistente [${request.method} ${request.url}]: ${mensajeOriginal}`;
+    } else {
+      detalleFormateado =
+        typeof errorResponse === 'object' ? JSON.stringify(errorResponse) : String(errorResponse);
+    }
+
     const errorLog = {
       tipoSistema: 'Backend',
       timestamp: new Date().toISOString(),
       ruta: request.url,
       metodo: request.method,
       codigoEstado: status,
-      detalle: typeof errorResponse === 'object' ? JSON.stringify(errorResponse) : String(errorResponse),
+      detalle: detalleFormateado,
     };
 
     try {
       const db = this.firebaseService.getFirestore();
       if (db) {
-        await Promise.race([
-          db.collection('errores').add(errorLog),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout al conectar con Firestore (3s)')), 3000)),
-        ]);
-        console.log('Error capturado y guardado en Firestore');
+        const docRef = await db.collection('errores').add(errorLog);
+        console.log(`Error capturado y guardado en Firestore`);
+      } else {
+        console.warn('No se pudo obtener la instancia de Firestore');
       }
     } catch (dbError: any) {
       console.error('No se pudo guardar el error en Firestore:', dbError?.message || dbError);

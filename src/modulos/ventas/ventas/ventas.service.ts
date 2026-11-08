@@ -77,12 +77,11 @@ export class VentasService {
             return nuevaVenta;
         });
 
-        // Disparo automático del email al cliente con el comprobante de venta
         try {
             await this.mailService.enviarComprobanteVenta(resultado.id);
-            console.log(`Email de comprobante enviado automáticamente para la venta #${resultado.id}`);
+            console.log(`Email de comprobante enviado`);
         } catch (mailError: any) {
-            console.error(`No se pudo enviar el email automático para la venta #${resultado.id}:`, mailError?.message || mailError);
+            console.error(`No se pudo enviar el email`, mailError?.message || mailError);
         }
 
         return resultado;
@@ -114,7 +113,7 @@ export class VentasService {
         });
     }
 
-    async actualizarEstado(id: number, estadoNuevo: EstadoVenta) {
+    async actualizarEstado(id: number, estadoNuevo: EstadoVenta, motivoCancelacion?: string) {
         return await this.prisma.$transaction(async (tx) => {
             const venta = await tx.venta.findUnique({
                 where: { id },
@@ -130,19 +129,26 @@ export class VentasService {
             }
 
             if (estadoNuevo === 'CANCELADO' && venta.estado !== 'CANCELADO') {
+                if (!motivoCancelacion || !motivoCancelacion.trim()) {
+                    throw new BadRequestException('Debe especificar un motivo de cancelación al cancelar la venta.');
+                }
+
                 for (const detalle of venta.detalles) {
-                await tx.producto.update({
-                    where: { id: detalle.productoId },
-                    data: {
-                    stockTotal: { increment: detalle.cantidad }
-                    }
-                });
+                    await tx.producto.update({
+                        where: { id: detalle.productoId },
+                        data: {
+                            stockTotal: { increment: detalle.cantidad }
+                        }
+                    });
                 }
             }
 
             return await tx.venta.update({
                 where: { id },
-                data: { estado: estadoNuevo },
+                data: { 
+                    estado: estadoNuevo,
+                    ...(estadoNuevo === 'CANCELADO' && motivoCancelacion ? { motivoCancelacion: motivoCancelacion.trim() } : {}),
+                },
             });
         });
     }
