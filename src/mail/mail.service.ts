@@ -70,4 +70,38 @@ export class MailService {
 
         return { message: `Comprobante de venta #${venta.id} enviado exitosamente a ${venta.cliente.email}` };
     }
+
+    async notificarDisponibleParaRetiro(ventaId: number) {
+        const venta = await this.prisma.venta.findUnique({
+            where: { id: ventaId },
+            include: { cliente: true, sucursal: true },
+        });
+
+        if (!venta || !venta.cliente?.email) {
+            return;
+        }
+
+        await this.mailerService.sendMail({
+            to: venta.cliente.email,
+            subject: `¡Tu pedido #V-${String(venta.id).padStart(4, '0')} ya está disponible para retirar! - BuySellCycle S.R.L.`,
+            text: `Hola ${venta.cliente.nombre},\n\nTe informamos que tu pedido #V-${String(venta.id).padStart(4, '0')} ya se encuentra listo y disponible para ser retirado en la sucursal:\n🏢 ${venta.sucursal?.nombre || 'Sucursal'}\n\nPor favor presentate con tu DNI para retirarlo.\n\nSaludos,\nEl equipo de BuySellCycle S.R.L.`,
+        });
+    }
+
+    async notificarPedidoEnCamino(ventaId: number) {
+        const venta = await this.prisma.venta.findUnique({
+            where: { id: ventaId },
+            include: { cliente: true },
+        });
+
+        if (!venta || !venta.cliente?.email) {
+            return;
+        }
+
+        await this.mailerService.sendMail({
+            to: venta.cliente.email,
+            subject: `¡Tu pedido #V-${String(venta.id).padStart(4, '0')} está en camino! - BuySellCycle S.R.L.`,
+            text: `Hola ${venta.cliente.nombre},\n\nTe informamos que tu pedido #V-${String(venta.id).padStart(4, '0')} está en camino hacia tu domicilio${venta.direccionEntregaTexto ? ` (${venta.direccionEntregaTexto})` : ''}.\n\nSaludos,\nEl equipo de BuySellCycle S.R.L.`,
+        });
+    }
 }

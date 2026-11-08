@@ -114,7 +114,7 @@ export class VentasService {
     }
 
     async actualizarEstado(id: number, estadoNuevo: EstadoVenta, motivoCancelacion?: string) {
-        return await this.prisma.$transaction(async (tx) => {
+        const ventaActualizada = await this.prisma.$transaction(async (tx) => {
             const venta = await tx.venta.findUnique({
                 where: { id },
                 include: { detalles: true }
@@ -126,6 +126,23 @@ export class VentasService {
 
             if (venta.estado === 'CANCELADO' && estadoNuevo !== 'CANCELADO') {
                 throw new BadRequestException('Una venta cancelada no puede volver a activarse. Debe crear una nueva.');
+            }
+
+            if (venta.estado === 'ENTREGADO' && estadoNuevo !== 'ENTREGADO' && estadoNuevo !== 'CANCELADO') {
+                throw new BadRequestException('Una venta entregada no puede regresar a un estado previo.');
+            }
+
+            // Validar compatibilidad entre el modo de entrega y el estado solicitado
+            if (venta.modoEntrega === 'RETIRO_SUCURSAL' && estadoNuevo === 'EN_CAMINO') {
+                throw new BadRequestException(
+                    'Una venta con retiro en sucursal no puede pasar a estado "En Camino". Debe utilizar "Disponible para retirar".'
+                );
+            }
+
+            if (venta.modoEntrega === 'ENTREGA_DOMICILIO' && estadoNuevo === 'DISPONIBLE_PARA_RETIRAR') {
+                throw new BadRequestException(
+                    'Una venta con entrega a domicilio no puede pasar a estado "Disponible para retirar". Debe utilizar "En Camino".'
+                );
             }
 
             if (estadoNuevo === 'CANCELADO' && venta.estado !== 'CANCELADO') {
@@ -151,5 +168,21 @@ export class VentasService {
                 },
             });
         });
+
+        if (estadoNuevo === 'DISPONIBLE_PARA_RETIRAR') {
+            try {
+                await this.mailService.notificarDisponibleParaRetiro(ventaActualizada.id);
+            } catch (mailError: any) {
+                console.error('No se pudo enviar notificación de retiro:', mailError?.message || mailError);
+            }
+        } else if (estadoNuevo === 'EN_CAMINO') {
+            try {
+                await this.mailService.notificarPedidoEnCamino(ventaActualizada.id);
+            } catch (mailError: any) {
+                console.error('No se pudo enviar notificación de despacho a domicilio:', mailError?.message || mailError);
+            }
+        }
+
+        return ventaActualizada;
     }
 }

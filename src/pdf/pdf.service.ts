@@ -129,8 +129,20 @@ export class PdfService {
                 doc.text('Abonado: Al Contado / Efectivo', 50, y);
             }
 
-            if (venta.estado === 'CANCELADO') {
-                y += 25;
+            y += 20;
+            doc.fontSize(10).font('Helvetica').fillColor('#555555');
+            if (venta.modoEntrega === 'RETIRO_SUCURSAL') {
+                doc.text(`Entrega: Retiro en Sucursal (${venta.sucursal?.nombre || 'Sucursal'})`, 50, y);
+            } else {
+                doc.text(`Entrega: Envío a Domicilio (${venta.direccionEntregaTexto || 'Domicilio acordado'})`, 50, y);
+            }
+
+            if (venta.estado === 'DISPONIBLE_PARA_RETIRAR') {
+                y += 15;
+                doc.fontSize(10).font('Helvetica-Bold').fillColor('#08979c');
+                doc.text(`ESTADO: DISPONIBLE PARA RETIRAR EN SUCURSAL`, 50, y);
+            } else if (venta.estado === 'CANCELADO') {
+                y += 15;
                 doc.fontSize(10).font('Helvetica-Bold').fillColor('#dc3545');
                 doc.text(`VENTA CANCELADA - Motivo: ${venta.motivoCancelacion || 'No especificado'}`, 50, y);
             }
