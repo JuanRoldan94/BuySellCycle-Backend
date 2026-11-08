@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsEnum } from "class-validator";
+import { IsString, IsNotEmpty, IsEnum, IsOptional } from "class-validator";
 import { TipoTarjeta } from "@prisma/client";
 
 export class CreateTarjetaDto {
@@ -9,4 +9,8 @@ export class CreateTarjetaDto {
     @IsEnum(TipoTarjeta)
     @IsNotEmpty({ message: 'El tipo de tarjeta es obligatorio' })
     tipo: TipoTarjeta;
+
+    @IsOptional()
+    @IsString()
+    rutaImagenStorage?: string;
 }
