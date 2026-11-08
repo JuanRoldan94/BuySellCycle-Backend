@@ -10,6 +10,7 @@ export class UbicacionesController {
   async getProvincias() {
     return await this.prisma.provincia.findMany({
       where: { archivado: false },
+      orderBy: { nombre: 'asc' },
     });
   }
 
@@ -17,6 +18,7 @@ export class UbicacionesController {
   async getLocalidades() {
     return await this.prisma.localidad.findMany({
       where: { archivado: false },
+      orderBy: { nombre: 'asc' },
     });
   }
 }

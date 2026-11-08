@@ -7,19 +7,21 @@ import { PrismaModule } from '../prisma/prisma.modules.js';
 
 @Module({
   imports: [
-    MailerModule.forRoot({
-      transport: {
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
-        auth: {
-          user: 'juan.m.roldan94@gmail.com',
-          pass: 'puvtjxahzohmioak', // (Recordá a futuro pasar esto a un .env)
+    MailerModule.forRootAsync({
+      useFactory: () => ({
+        transport: {
+          host: process.env.MAIL_HOST || 'smtp.gmail.com',
+          port: Number(process.env.MAIL_PORT) || 465,
+          secure: process.env.MAIL_SECURE !== 'false',
+          auth: {
+            user: process.env.MAIL_USER,
+            pass: process.env.MAIL_PASS,
+          },
         },
-      },
-      defaults: {
-        from: ' "BuySellCycle S.R.L. " <juan.m.roldan94@gmail.com>',
-      },
+        defaults: {
+          from: process.env.MAIL_FROM || `"BuySellCycle S.R.L." <${process.env.MAIL_USER}>`,
+        },
+      }),
     }),
     PdfModule,
     PrismaModule,
