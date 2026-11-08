@@ -2,13 +2,17 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { PrismaService } from '../../../prisma/prisma.service.js';
 import { CrearVentaDto } from './dto/crear-venta.dto.js';
 import { EstadoVenta } from '@prisma/client';
+import { MailService } from '../../../mail/mail.service.js';
 
 @Injectable()
 export class VentasService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly mailService: MailService,
+    ) {}
 
     async registrarVenta(datos: CrearVentaDto) {
-        return await this.prisma.$transaction(async (tx) => {
+        const resultado = await this.prisma.$transaction(async (tx) => {
             let totalSinInteres = 0;
             const detallesParaInsertar = [];
 
@@ -72,6 +76,15 @@ export class VentasService {
 
             return nuevaVenta;
         });
+
+        try {
+            await this.mailService.enviarComprobanteVenta(resultado.id);
+            console.log(`Email de comprobante enviado`);
+        } catch (mailError: any) {
+            console.error(`No se pudo enviar el email`, mailError?.message || mailError);
+        }
+
+        return resultado;
     }
 
     async findAll() {
@@ -100,8 +113,8 @@ export class VentasService {
         });
     }
 
-    async actualizarEstado(id: number, estadoNuevo: EstadoVenta) {
-        return await this.prisma.$transaction(async (tx) => {
+    async actualizarEstado(id: number, estadoNuevo: EstadoVenta, motivoCancelacion?: string) {
+        const ventaActualizada = await this.prisma.$transaction(async (tx) => {
             const venta = await tx.venta.findUnique({
                 where: { id },
                 include: { detalles: true }
@@ -115,21 +128,61 @@ export class VentasService {
                 throw new BadRequestException('Una venta cancelada no puede volver a activarse. Debe crear una nueva.');
             }
 
+            if (venta.estado === 'ENTREGADO' && estadoNuevo !== 'ENTREGADO' && estadoNuevo !== 'CANCELADO') {
+                throw new BadRequestException('Una venta entregada no puede regresar a un estado previo.');
+            }
+
+            // Validar compatibilidad entre el modo de entrega y el estado solicitado
+            if (venta.modoEntrega === 'RETIRO_SUCURSAL' && estadoNuevo === 'EN_CAMINO') {
+                throw new BadRequestException(
+                    'Una venta con retiro en sucursal no puede pasar a estado "En Camino". Debe utilizar "Disponible para retirar".'
+                );
+            }
+
+            if (venta.modoEntrega === 'ENTREGA_DOMICILIO' && estadoNuevo === 'DISPONIBLE_PARA_RETIRAR') {
+                throw new BadRequestException(
+                    'Una venta con entrega a domicilio no puede pasar a estado "Disponible para retirar". Debe utilizar "En Camino".'
+                );
+            }
+
             if (estadoNuevo === 'CANCELADO' && venta.estado !== 'CANCELADO') {
+                if (!motivoCancelacion || !motivoCancelacion.trim()) {
+                    throw new BadRequestException('Debe especificar un motivo de cancelación al cancelar la venta.');
+                }
+
                 for (const detalle of venta.detalles) {
-                await tx.producto.update({
-                    where: { id: detalle.productoId },
-                    data: {
-                    stockTotal: { increment: detalle.cantidad }
-                    }
-                });
+                    await tx.producto.update({
+                        where: { id: detalle.productoId },
+                        data: {
+                            stockTotal: { increment: detalle.cantidad }
+                        }
+                    });
                 }
             }
 
             return await tx.venta.update({
                 where: { id },
-                data: { estado: estadoNuevo },
+                data: { 
+                    estado: estadoNuevo,
+                    ...(estadoNuevo === 'CANCELADO' && motivoCancelacion ? { motivoCancelacion: motivoCancelacion.trim() } : {}),
+                },
             });
         });
+
+        if (estadoNuevo === 'DISPONIBLE_PARA_RETIRAR') {
+            try {
+                await this.mailService.notificarDisponibleParaRetiro(ventaActualizada.id);
+            } catch (mailError: any) {
+                console.error('No se pudo enviar notificación de retiro:', mailError?.message || mailError);
+            }
+        } else if (estadoNuevo === 'EN_CAMINO') {
+            try {
+                await this.mailService.notificarPedidoEnCamino(ventaActualizada.id);
+            } catch (mailError: any) {
+                console.error('No se pudo enviar notificación de despacho a domicilio:', mailError?.message || mailError);
+            }
+        }
+
+        return ventaActualizada;
     }
 }

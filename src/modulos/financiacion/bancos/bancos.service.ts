@@ -21,6 +21,9 @@ export class BancosService {
         archivado: false
       },
     });
+
+    if (!registro) throw new NotFoundException(`Banco #${id} no encontrado`);
+    return registro;
   }
 
   async update(id: number, data: UpdateBancoDto) {

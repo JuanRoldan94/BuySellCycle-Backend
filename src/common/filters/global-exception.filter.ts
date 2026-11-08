@@ -1,10 +1,10 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { FirebaseService } from '../../firebase/firebase.service.js'; 
+import { FirebaseService } from '../../firebase/firebase.service.js';
 
-@Catch() 
+@Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
-  constructor(private readonly firebaseService: FirebaseService) {}
+  constructor(private readonly firebaseService: FirebaseService) { }
 
   async catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -21,21 +21,38 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         ? exception.getResponse()
         : exception;
 
+    let detalleFormateado: string;
+    if (status === HttpStatus.NOT_FOUND) {
+      const mensajeOriginal =
+        typeof errorResponse === 'object' && errorResponse !== null
+          ? (errorResponse as any).message || JSON.stringify(errorResponse)
+          : String(errorResponse);
+
+      detalleFormateado = `Intento de acceso a endpoint inexistente [${request.method} ${request.url}]: ${mensajeOriginal}`;
+    } else {
+      detalleFormateado =
+        typeof errorResponse === 'object' ? JSON.stringify(errorResponse) : String(errorResponse);
+    }
+
     const errorLog = {
-      tipoSistema: 'Backend', 
+      tipoSistema: 'Backend',
       timestamp: new Date().toISOString(),
       ruta: request.url,
       metodo: request.method,
       codigoEstado: status,
-      detalle: typeof errorResponse === 'object' ? JSON.stringify(errorResponse) : String(errorResponse),
+      detalle: detalleFormateado,
     };
 
     try {
       const db = this.firebaseService.getFirestore();
-      await db.collection('errores').add(errorLog);
-      console.log('Error capturado y guardado en Firestore');
-    } catch (dbError) {
-      console.error('Error crítico al intentar guardar en Firestore:', dbError);
+      if (db) {
+        const docRef = await db.collection('errores').add(errorLog);
+        console.log(`Error capturado y guardado en Firestore`);
+      } else {
+        console.warn('No se pudo obtener la instancia de Firestore');
+      }
+    } catch (dbError: any) {
+      console.error('No se pudo guardar el error en Firestore:', dbError?.message || dbError);
     }
 
     response.status(status).json({

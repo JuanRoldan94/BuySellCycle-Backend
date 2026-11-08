@@ -64,3 +64,8 @@ prisma/prisma.service.js.map
 
 # Cache
 *.tsbuildinfo
+
+# Firebase local exports and data
+firebase-export-*
+firebase-data/
+*.log

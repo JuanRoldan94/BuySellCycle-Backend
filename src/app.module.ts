@@ -25,6 +25,8 @@ import { BancosModule } from './modulos/financiacion/bancos/bancos.module.js';
 import { TarjetasModule } from './modulos/financiacion/tarjetas/tarjetas.module.js';
 import { PlanesModule } from './modulos/financiacion/planes/planes.module.js';
 import { PdfModule } from './pdf/pdf.module.js';
+import { MailModule } from './mail/mail.module.js';
+import { DashboardModule } from './modulos/dashboard/dashboard.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -38,6 +40,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       appSecret: 'YOUR_APP_SECRET',
       serviceId: 'buysellcycle-backend',
     }),
+
     ProductosModule,
     MarcasModule,
     DepositosModule,
@@ -59,6 +62,8 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     TarjetasModule,
     PlanesModule,
     PdfModule,
+    MailModule,
+    DashboardModule,
   ],
   controllers: [AppController, UbicacionesController],
   providers: [AppService],

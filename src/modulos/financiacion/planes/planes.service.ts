@@ -24,7 +24,11 @@ export class PlanesService {
         id: id,
         archivado: false
       },
+      include: { tarjeta: true, banco: true },
     });
+
+    if (!registro) throw new NotFoundException(`Plan #${id} no encontrado`);
+    return registro;
   }
 
   findAll() {
@@ -35,10 +39,10 @@ export class PlanesService {
   }
 
   async update(id: number, data: UpdatePlaneDto) {
-    const tarjeta = await this.prisma.tarjeta.findUnique({ where: { id } });
-    if (!tarjeta) throw new NotFoundException(`Tarjeta #${id} no encontrada`);
+    const plan = await this.prisma.plan.findUnique({ where: { id } });
+    if (!plan) throw new NotFoundException(`Plan #${id} no encontrado`);
 
-    return this.prisma.tarjeta.update({ where: { id }, data})
+    return this.prisma.plan.update({ where: { id }, data });
   }
 
   async remove(id: number) {

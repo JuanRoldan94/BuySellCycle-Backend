@@ -21,7 +21,8 @@ export class ArchivosService {
             metadata: { contentType: 'image/webp'},
         });
 
-        const urlPublica = `http://127.0.0.1:9199/v0/b/${bucket.name}/o/${encodeURIComponent(nombreArchivo)}?alt=media`;
+        const emulatorHost = process.env.FIREBASE_STORAGE_EMULATOR_HOST || '127.0.0.1:9199';
+        const urlPublica = `http://${emulatorHost}/v0/b/${bucket.name}/o/${encodeURIComponent(nombreArchivo)}?alt=media`;
         return urlPublica;
     }
 }
