@@ -7,7 +7,7 @@ import { PrismaService } from '../../../prisma/prisma.service.js';
 export class TarjetasService {
   constructor(private readonly prisma: PrismaService){}
   create(data: CreateTarjetaDto) {
-    return this.prisma.banco.create({ data });
+    return this.prisma.tarjeta.create({ data });
   }
 
   findAll() {
@@ -21,6 +21,9 @@ export class TarjetasService {
         archivado: false
       },
     });
+
+    if (!registro) throw new NotFoundException(`Tarjeta #${id} no encontrada`);
+    return registro;
   }
 
   async update(id: number, data: UpdateTarjetaDto) {
