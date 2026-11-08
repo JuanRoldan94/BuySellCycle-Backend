@@ -39,4 +39,35 @@ export class MailService {
 
         return { message: 'Presupuesto enviado exitosamente a ' + cliente.email };
     }
+
+    async enviarComprobanteVenta(ventaId: number) {
+        const venta = await this.prisma.venta.findUnique({
+            where: { id: ventaId },
+            include: { cliente: true },
+        });
+
+        if (!venta) {
+            throw new NotFoundException(`La venta #${ventaId} no existe`);
+        }
+
+        if (!venta.cliente?.email) {
+            throw new BadRequestException(`El cliente ${venta.cliente?.nombre || ''} no tiene un email registrado`);
+        }
+
+        const pdfBuffer = await this.pdfService.generarComprobanteVenta(ventaId);
+
+        await this.mailerService.sendMail({
+            to: venta.cliente.email,
+            subject: `Comprobante de Compra #${venta.id} - BuySellCycle S.R.L.`,
+            text: `Hola ${venta.cliente.nombre},\n\nMuchas gracias por tu compra en BuySellCycle S.R.L.\nAdjuntamos el comprobante de tu venta #${venta.id}.\n\nSaludos cordiales,\nEl equipo de BuySellCycle.`,
+            attachments: [
+                {
+                    filename: `Comprobante-Venta-${venta.id}.pdf`,
+                    content: pdfBuffer,
+                }
+            ]
+        });
+
+        return { message: `Comprobante de venta #${venta.id} enviado exitosamente a ${venta.cliente.email}` };
+    }
 }

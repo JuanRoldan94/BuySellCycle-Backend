@@ -2,13 +2,17 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { PrismaService } from '../../../prisma/prisma.service.js';
 import { CrearVentaDto } from './dto/crear-venta.dto.js';
 import { EstadoVenta } from '@prisma/client';
+import { MailService } from '../../../mail/mail.service.js';
 
 @Injectable()
 export class VentasService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly mailService: MailService,
+    ) {}
 
     async registrarVenta(datos: CrearVentaDto) {
-        return await this.prisma.$transaction(async (tx) => {
+        const resultado = await this.prisma.$transaction(async (tx) => {
             let totalSinInteres = 0;
             const detallesParaInsertar = [];
 
@@ -72,6 +76,16 @@ export class VentasService {
 
             return nuevaVenta;
         });
+
+        // Disparo automático del email al cliente con el comprobante de venta
+        try {
+            await this.mailService.enviarComprobanteVenta(resultado.id);
+            console.log(`Email de comprobante enviado automáticamente para la venta #${resultado.id}`);
+        } catch (mailError: any) {
+            console.error(`No se pudo enviar el email automático para la venta #${resultado.id}:`, mailError?.message || mailError);
+        }
+
+        return resultado;
     }
 
     async findAll() {
