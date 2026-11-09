@@ -132,7 +132,6 @@ export class VentasService {
                 throw new BadRequestException('Una venta entregada no puede regresar a un estado previo.');
             }
 
-            // Validar compatibilidad entre el modo de entrega y el estado solicitado
             if (venta.modoEntrega === 'RETIRO_SUCURSAL' && estadoNuevo === 'EN_CAMINO') {
                 throw new BadRequestException(
                     'Una venta con retiro en sucursal no puede pasar a estado "En Camino". Debe utilizar "Disponible para retirar".'
